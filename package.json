@@ -22,7 +22,8 @@
   "homepage": "https://github.com/wiomoc/misc#readme",
   "dependencies": {
     "highlight.js": "^11.3.1",
-    "marked": "^4.0.4"
+    "marked": "^4.0.4",
+    "yaml": "^1.10.2"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.4",

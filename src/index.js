@@ -1,4 +1,6 @@
 import { parseMarkdown } from './markdown.js'
+import { readConfiguration } from './config.js'
+
 
 console.log(parseMarkdown(`
 [tags]: abc, 123
