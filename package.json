@@ -1,0 +1,32 @@
+{
+  "name": "miscc",
+  "version": "1.0.0",
+  "description": "compiler for static blogs",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/wiomoc/misc.git"
+  },
+  "keywords": [
+    "blog"
+  ],
+  "author": "Christoph Walcher",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wiomoc/misc/issues"
+  },
+  "homepage": "https://github.com/wiomoc/misc#readme",
+  "dependencies": {
+    "highlight.js": "^11.3.1",
+    "marked": "^4.0.4"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.16.4",
+    "babel-jest": "^27.3.1",
+    "jest": "^27.3.1"
+  }
+}
