@@ -1,14 +1,28 @@
-import { parseMarkdown } from './markdown.js'
+#!/usr/bin/env node
+
 import { readConfiguration } from './config.js'
+import { PageTracker } from './pageTracker.js';
+import { AssetTracker } from './assetTracker.js';
+import { transformPost } from './transformer.js';
+import { mkdirIfNotExists } from './utils.js'
 
+async function main() {
+    const config = readConfiguration("miscc.yml");
+    const pageTracker = new PageTracker();
+    pageTracker.discover();
+    const assetTracker = new AssetTracker();
+    const outputDir = "dist";
 
-console.log(parseMarkdown(`
-[tags]: abc, 123
-[title]: eqweqw
+    const context = {
+        tags: config.tags,
+        pageResolver: pageTracker.resolve.bind(pageTracker),
+        assetResolver: assetTracker.resolve.bind(assetTracker),
+    }
+    mkdirIfNotExists(outputDir);
+    mkdirIfNotExists(outputDir + "/posts");
+    await Promise.all([...pageTracker.posts.values()]
+        .map(post => transformPost(post.src, outputDir + "/" + post.dest, context)))
+    assetTracker.copyToOutput(outputDir);
+}
 
-lorum ipsum
-warum ist die banane krumm?
-
-
-        console.log("123", x, 234)
-    `));
+await main()

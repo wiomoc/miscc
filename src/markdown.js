@@ -1,4 +1,4 @@
-import { marked } from 'marked'
+import { marked, Renderer } from 'marked'
 import hljs from 'highlight.js';
 
 let metaEntries;
@@ -19,7 +19,34 @@ const meta = {
     },
 };
 
-marked.use({ extensions: [meta] });
+let assetResolver;
+let pageResolver;
+
+const renderer = {
+    link(ref, title, text) {
+        if (ref === null) {
+            return text;
+        }
+        let href = pageResolver(ref);
+        if (!href) {
+            href = ref;
+        }
+        return Renderer.prototype.link.call(this, href, title, text)
+    },
+
+    image(ref, title, text) {
+        if (ref === null) {
+            return text;
+        }
+        let href = assetResolver(ref);
+        if (!href) {
+            href = ref;
+        }
+        return Renderer.prototype.image.call(this, href, title, text)
+    }
+}
+
+marked.use({ extensions: [meta], renderer });
 
 let containsCode
 marked.setOptions({
@@ -33,9 +60,12 @@ marked.setOptions({
     }
 });
 
-export function parseMarkdown(markdownSource) {
+// Not reentrant
+export function parseMarkdown(markdownSource, resolver) {
     metaEntries = new Map();
     containsCode = false;
+    assetResolver = resolver.assetResolver;
+    pageResolver = resolver.pageResolver;
     const html = marked.parse(markdownSource)
     return {
         metaEntries,

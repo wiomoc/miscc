@@ -7,6 +7,9 @@
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
+  "bin": {
+    "miscc": "src/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/wiomoc/misc.git"
@@ -21,6 +24,7 @@
   },
   "homepage": "https://github.com/wiomoc/misc#readme",
   "dependencies": {
+    "ejs": "^3.1.6",
     "highlight.js": "^11.3.1",
     "marked": "^4.0.4",
     "yaml": "^1.10.2"
