@@ -3,7 +3,7 @@
 import { readConfiguration } from './config.js'
 import { PageTracker } from './pageTracker.js';
 import { AssetTracker } from './assetTracker.js';
-import { transformPost } from './transformer.js';
+import { transformPost, generateIndex } from './transformer.js';
 import { mkdirIfNotExists } from './utils.js'
 
 async function main() {
@@ -21,8 +21,10 @@ async function main() {
     mkdirIfNotExists(outputDir);
     mkdirIfNotExists(outputDir + "/posts");
     await Promise.all([...pageTracker.posts.values()]
-        .map(post => transformPost(post.src, outputDir + "/" + post.dest, context)))
-    assetTracker.copyToOutput(outputDir);
+        .map(post => transformPost(post, outputDir, context)))
+
+    await generateIndex(pageTracker.posts.values(), outputDir, context);
+    await assetTracker.copyToOutput(outputDir);
 }
 
 await main()

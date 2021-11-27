@@ -8,15 +8,19 @@ import ejs from 'ejs';
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
+const stat = promisify(fs.stat);
 const templateDir = "template"
 
-export async function transformPost(srcFile, destFile, context) {
+export async function transformPost(post, outputBaseDir, context) {
+    const srcFile = post.src;
     const {
         pageResolver,
         assetResolver,
         tags: allTags
     } = context;
     const content = await readFile(srcFile, "UTF-8");
+    const fileStat = await stat(srcFile);
+    const creationDate = fileStat.ctime;
 
     const {
         metaEntries,
@@ -40,17 +44,41 @@ export async function transformPost(srcFile, destFile, context) {
             if (!tag) {
                 throw new Error(`Tag '${tagName}' doesn't exist`);
             }
-            tags.push(tagName);
+            tags.push(tag);
         }
     }
+    post.tags = tags;
+    post.title = title;
+    post.creationDate = creationDate;
 
     const data = {
         ref: pageResolver,
         asset: assetResolver,
         contentHtml: html,
-        title,
         containsCode,
         metaEntries,
+        ...post
+    }
+
+    const resultHtml = await ejs.renderFile(template, data, {
+        root: templateDir
+    });
+
+    await writeFile(outputBaseDir + "/" + post.dest, resultHtml, { encoding: "UTF-8" });
+}
+
+export async function generateIndex(posts, outputBaseDir, context) {
+    const {
+        pageResolver,
+        assetResolver,
+        tags
+    } = context;
+    const template = `${templateDir}/pages/index.ejs`
+
+    const data = {
+        ref: pageResolver,
+        asset: assetResolver,
+        posts,
         tags
     }
 
@@ -58,5 +86,5 @@ export async function transformPost(srcFile, destFile, context) {
         root: templateDir
     });
 
-    await writeFile(destFile, resultHtml, { encoding: "UTF-8" });
+    await writeFile(outputBaseDir + "/index.html", resultHtml, { encoding: "UTF-8" });
 }

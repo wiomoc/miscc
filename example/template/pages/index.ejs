@@ -1,7 +1,11 @@
 <html>
     <head>
-        <title><%=title%></title>
+        <title>misc</title>
     </head>
-    <h1><%=title%></h1>
-    <%-htmlContent%>
+    <h1>misc</h1>
+    <div>
+    <% for(let post of posts) { %>
+        <div><a href="<%=post.dest%>"><%=post.title %></a></div>
+    <% } %>
+    </div>
 </html>
