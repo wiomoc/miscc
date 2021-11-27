@@ -6,20 +6,24 @@ const postsOutputDir = "posts";
 
 export class PageTracker {
     constructor() {
-        this.posts = new Map();
+        this._posts = new Map();
     }
 
-    resolve(ref) {
+    resolve(ref, currentRef) {
         if (!ref) return;
         let href;
         if (ref.startsWith("#")) {
             const postId = ref.substring(1);
-            const post = this.posts.get(postId);
+            const post = this._posts.get(postId);
             if (!post) {
                 console.warn(`couldn't resolve reference to post '${postId}'`);
                 return
             }
-            return "/" + post.dest;
+            if (currentRef) {
+                return path.relative(path.basename(currentRef), post.dest);
+            } else {
+                return "/" + post.dest;
+            }
         } else {
             return null;
         }
@@ -34,10 +38,11 @@ export class PageTracker {
             postId = postId.substring(0, postId.length - 3);
         }
 
-        if (this.posts.has(postId)) {
+        if (this._posts.has(postId)) {
             throw new Error(`Duplicate post '${postId}'`);
         }
-        this.posts.set(postId, {
+        this._posts.set(postId, {
+            id: postId,
             src: postFile,
             dest: postsOutputDir + "/" + postId + ".html"
         });
@@ -52,5 +57,13 @@ export class PageTracker {
                 this.addPost(filepath);
             }
         }
+    }
+
+    get posts() {
+        return [...this._posts.values()]
+    }
+
+    get publicPosts() {
+        return this.posts.filter(post => !post.private)
     }
 }

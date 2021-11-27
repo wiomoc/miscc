@@ -1,0 +1,8 @@
+name: "miscc"
+description: "Runs miscc to compile a markdown blog to a static file"
+runs:
+  using: "node17"
+  main: "src/index.js"
+branding:
+  icon: "file-text"
+  color: "blue"

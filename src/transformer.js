@@ -27,7 +27,7 @@ export async function transformPost(post, outputBaseDir, context) {
         containsCode,
         html
     } = parseMarkdown(content, {
-        pageResolver,
+        pageResolver: (ref) => pageResolver(ref, post.dest),
         assetResolver: (ref) => assetResolver(ref, srcFile)
     });
 
@@ -36,6 +36,7 @@ export async function transformPost(post, outputBaseDir, context) {
 
     const title = metaEntries.get("title");
     const tagNames = metaEntries.get("tags");
+    const priv = metaEntries.get("private") === "true";
     const tags = []
     if (tagNames) {
         for (let tagName of tagNames.split(",")) {
@@ -49,6 +50,7 @@ export async function transformPost(post, outputBaseDir, context) {
     }
     post.tags = tags;
     post.title = title;
+    post.private = priv;
     post.creationDate = creationDate;
 
     const data = {
@@ -74,6 +76,7 @@ export async function generateIndex(posts, outputBaseDir, context) {
         tags
     } = context;
     const template = `${templateDir}/pages/index.ejs`
+    const dest = "index.html"
 
     const data = {
         ref: pageResolver,
@@ -86,5 +89,5 @@ export async function generateIndex(posts, outputBaseDir, context) {
         root: templateDir
     });
 
-    await writeFile(outputBaseDir + "/index.html", resultHtml, { encoding: "UTF-8" });
+    await writeFile(outputBaseDir + "/" + dest, resultHtml, { encoding: "UTF-8" });
 }

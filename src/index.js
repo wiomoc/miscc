@@ -20,10 +20,10 @@ async function main() {
     }
     mkdirIfNotExists(outputDir);
     mkdirIfNotExists(outputDir + "/posts");
-    await Promise.all([...pageTracker.posts.values()]
+    await Promise.all([...pageTracker.posts]
         .map(post => transformPost(post, outputDir, context)))
 
-    await generateIndex(pageTracker.posts.values(), outputDir, context);
+    await generateIndex(pageTracker.publicPosts, outputDir, context);
     await assetTracker.copyToOutput(outputDir);
 }
 
