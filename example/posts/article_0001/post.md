@@ -1,6 +1,7 @@
-[tags]: misc
-
-[title]: First Post
+---
+tags: misc
+title: First Post
+---
 
 # Heading
 

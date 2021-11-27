@@ -5,15 +5,18 @@ let metaEntries;
 const meta = {
     name: 'meta',
     level: 'block',
-    start(src) { return src.match(/^\[/m)?.index; },
+    start(src) { return src.match(/^---/)?.index; },
     tokenizer(src, tokens) {
-        const rule = /^\[(\w+)\]:\s?(.+)(?:\n|$)+/;
-        const match = rule.exec(src);
-        if (match) {
-            metaEntries.set(match[1], match[2]);
+        const rule = /^---([\s\S\n]+)---/;
+        const blockMatch = rule.exec(src);
+        if (blockMatch) {
+            const block = blockMatch[1];
+            for (let keyValueMatch of block.matchAll(/^(\S+):\s*(.+)$/gm)) {
+                metaEntries.set(keyValueMatch[1], keyValueMatch[2]);
+            }
             return {
                 type: 'space',
-                raw: match[0]
+                raw: blockMatch[0]
             }
         }
     },

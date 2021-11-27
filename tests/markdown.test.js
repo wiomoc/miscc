@@ -3,8 +3,10 @@ import { parseMarkdown } from '../src/markdown.js'
 describe('parse markdown', () => {
     test('smoke test', () => {
         const md = `
-[tags]: abc, 123
-[title]: eqweqw
+---
+tags: abc, 123
+title: eqweqw
+---
 
 lorum ipsum
 warum ist die banane krumm?

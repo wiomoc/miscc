@@ -1,5 +1,7 @@
-[tags]: embedded
-[private]: true
+---
+tags: embedded
+private: true
+---
 
 [title]: Private Post
 

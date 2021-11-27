@@ -1,6 +1,7 @@
-[tags]: embedded
-
-[title]: Second Post
+---
+tags: embedded
+title: Second Post
+---
 
 # Heading
 

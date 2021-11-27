@@ -1,4 +1,4 @@
-name: "miscc"
+name: "run-miscc"
 description: "Runs miscc to compile a markdown blog to a static file"
 runs:
   using: "node17"
