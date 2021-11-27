@@ -1,8 +1,12 @@
 name: "run-miscc"
-description: "Runs miscc to compile a markdown blog to a static file"
+description: "Runs miscc to compile a markdown blog to a static html files"
+inputs:
+  folder:
+    description: "Directory of blog"
+    required: false
 runs:
-  using: "node17"
-  main: "src/index.js"
+  using: "node12"
+  main: "dist/index.cjs"
 branding:
   icon: "file-text"
   color: "blue"

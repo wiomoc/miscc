@@ -1,12 +1,12 @@
-#!/usr/bin/env node
-
 import { readConfiguration } from './config.js'
 import { PageTracker } from './pageTracker.js';
 import { AssetTracker } from './assetTracker.js';
 import { transformPost, generateIndex } from './transformer.js';
 import { mkdirIfNotExists } from './utils.js'
+import process from 'process';
 
 async function main() {
+    if (process.env["INPUT_FOLDER"]) process.chdir(process.env["INPUT_FOLDER"]);
     const config = readConfiguration("miscc.yml");
     const pageTracker = new PageTracker();
     pageTracker.discover();
@@ -27,4 +27,4 @@ async function main() {
     await assetTracker.copyToOutput(outputDir);
 }
 
-await main()
+main()

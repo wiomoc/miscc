@@ -1,14 +1,15 @@
 {
   "name": "miscc",
   "version": "0.0.1",
-  "description": "compiler for static blogs",
-  "main": "index.js",
+  "description": "simple jekyll-like static markdown blog generator",
+  "main": "src/index.js",
   "type": "module",
   "scripts": {
+    "build": "rollup -c --format cjs",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "bin": {
-    "miscc": "src/index.js"
+    "miscc": "bin/miscc.js"
   },
   "repository": {
     "type": "git",
@@ -31,7 +32,11 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.4",
-    "babel-jest": "^27.3.1",
-    "jest": "^27.3.1"
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.0.6",
+    "jest": "^27.3.1",
+    "rollup": "^2.60.1"
   }
 }
