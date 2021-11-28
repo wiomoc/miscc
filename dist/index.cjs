@@ -6728,7 +6728,9 @@ class PageTracker {
 
 function mkdirIfNotExists(dir) {
   try {
-    fs__default["default"].mkdirSync(dir);
+    fs__default["default"].mkdirSync(dir, {
+      recursive: true
+    });
   } catch (e) {
     if (e.code !== 'EEXIST') throw e;
   }
@@ -32547,22 +32549,22 @@ async function generateIndex(posts, outputBaseDir, context) {
 }
 
 async function main() {
-  if (process__default["default"].env["INPUT_FOLDER"]) process__default["default"].chdir(process__default["default"].env["INPUT_FOLDER"]);
+  if (process__default["default"].env["INPUT_DIR"]) process__default["default"].chdir(process__default["default"].env["INPUT_DIR"]);
+  const outputBaseDir = process__default["default"].env["INPUT_OUTDIR"] || "dist";
   const config = readConfiguration("miscc.yml");
   const pageTracker = new PageTracker();
   pageTracker.discover();
   const assetTracker = new AssetTracker();
-  const outputDir = "dist";
   const context = {
     tags: config.tags,
     pageResolver: pageTracker.resolve.bind(pageTracker),
     assetResolver: assetTracker.resolve.bind(assetTracker)
   };
-  mkdirIfNotExists(outputDir);
-  mkdirIfNotExists(outputDir + "/posts");
-  await Promise.all([...pageTracker.posts].map(post => transformPost(post, outputDir, context)));
-  await generateIndex(pageTracker.publicPosts, outputDir, context);
-  await assetTracker.copyToOutput(outputDir);
+  mkdirIfNotExists(outputBaseDir);
+  mkdirIfNotExists(outputBaseDir + "/posts");
+  await Promise.all([...pageTracker.posts].map(post => transformPost(post, outputBaseDir, context)));
+  await generateIndex(pageTracker.publicPosts, outputBaseDir, context);
+  await assetTracker.copyToOutput(outputBaseDir);
 }
 
 main();

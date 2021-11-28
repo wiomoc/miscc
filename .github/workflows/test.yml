@@ -22,4 +22,4 @@ jobs:
       - name: Action selftest
         uses: ./
         with:
-          folder: example
+          dir: example

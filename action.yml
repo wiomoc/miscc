@@ -1,8 +1,11 @@
 name: "run-miscc"
 description: "Runs miscc to compile a markdown blog to a static html files"
 inputs:
-  folder:
+  dir:
     description: "Directory of blog"
+    required: false
+  outdir:
+    description: "Directory for the generated output"
     required: false
 runs:
   using: "node12"

@@ -6,25 +6,25 @@ import { mkdirIfNotExists } from './utils.js'
 import process from 'process';
 
 async function main() {
-    if (process.env["INPUT_FOLDER"]) process.chdir(process.env["INPUT_FOLDER"]);
+    if (process.env["INPUT_DIR"]) process.chdir(process.env["INPUT_DIR"]);
+    const outputBaseDir = process.env["INPUT_OUTDIR"] || "dist";
     const config = readConfiguration("miscc.yml");
     const pageTracker = new PageTracker();
     pageTracker.discover();
     const assetTracker = new AssetTracker();
-    const outputDir = "dist";
 
     const context = {
         tags: config.tags,
         pageResolver: pageTracker.resolve.bind(pageTracker),
         assetResolver: assetTracker.resolve.bind(assetTracker),
     }
-    mkdirIfNotExists(outputDir);
-    mkdirIfNotExists(outputDir + "/posts");
+    mkdirIfNotExists(outputBaseDir);
+    mkdirIfNotExists(outputBaseDir + "/posts");
     await Promise.all([...pageTracker.posts]
-        .map(post => transformPost(post, outputDir, context)))
+        .map(post => transformPost(post, outputBaseDir, context)))
 
-    await generateIndex(pageTracker.publicPosts, outputDir, context);
-    await assetTracker.copyToOutput(outputDir);
+    await generateIndex(pageTracker.publicPosts, outputBaseDir, context);
+    await assetTracker.copyToOutput(outputBaseDir);
 }
 
 main()
