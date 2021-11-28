@@ -6744,7 +6744,7 @@ class AssetTracker {
     this._outputs = new Set();
   }
 
-  resolve(ref, basePath) {
+  resolve(ref, srcPath, currentRef) {
     if (!ref) return;
     let assetFile;
 
@@ -6753,7 +6753,7 @@ class AssetTracker {
     } else if (ref.startsWith("https://") || ref.startsWith("https://") || ref.indexOf("../") !== -1) {
       return null;
     } else {
-      const dir = path__default["default"].dirname(basePath);
+      const dir = path__default["default"].dirname(srcPath);
       assetFile = dir + "/" + ref;
     }
 
@@ -6767,7 +6767,11 @@ class AssetTracker {
       assetOutputFile = this.add(assetFile);
     }
 
-    return "/" + assetOutputFile;
+    if (currentRef) {
+      return path__default["default"].relative(path__default["default"].basename(currentRef), assetOutputFile);
+    } else {
+      return "/" + assetOutputFile;
+    }
   }
 
   add(assetFile) {
@@ -31215,7 +31219,7 @@ const footnoteRef = {
   },
 
   tokenizer(src, tokens) {
-    const rule = /^\[\^(.*)\][^:]/;
+    const rule = /^\[\^(\S+)\][^:]/;
     const match = rule.exec(src);
 
     if (match) {
@@ -31228,7 +31232,12 @@ const footnoteRef = {
   },
 
   renderer(token) {
-    return `\n<a href=#${token.index}>abc</a>`;
+    if (!footnotes.has(token.index)) {
+      console.warn(`Unknown footnote '${token.index}'`);
+      return "";
+    } else {
+      return `\n<a href="#anchor-${token.index}">${token.index}</a>`;
+    }
   }
 
 };
@@ -31243,21 +31252,24 @@ const footnoteDef = {
   },
 
   tokenizer(src, tokens) {
-    const rule = /^\[\^(.*)\]:\s?(.*)/;
+    const rule = /^\[\^(\S+)\]:\s?(.*)/;
     const match = rule.exec(src);
-    console.log(match);
 
     if (match) {
-      footnotes.set(match[1], match[2]);
+      footnotes.add(match[1]);
       return {
-        type: 'space',
-        raw: match[0]
+        type: 'footnoteDef',
+        raw: match[0],
+        index: match[1],
+        content: this.lexer.inlineTokens(match[2])
       };
+    } else {
+      return footnoteRef.tokenizer(src, tokens);
     }
   },
 
   renderer(token) {
-    return `\n<a href=#${token.index}>abc</a>`;
+    return `\n<div id="anchor-${token.index}">${token.index}: ${this.parser.parseInline(token.content)}</div>`;
   }
 
 };
@@ -31287,6 +31299,8 @@ const renderer = {
 
     if (!href) {
       href = ref;
+    } else if (ref.endsWith(".html")) {
+      return `<iframe src="${href}">${text}</iframe>`;
     }
 
     return Renderer.prototype.image.call(this, href, title, text);
@@ -31313,7 +31327,7 @@ marked.setOptions({
 }); // Not reentrant
 
 function parseMarkdown(markdownSource, resolver) {
-  footnotes = new Map();
+  footnotes = new Set();
   metaEntries = new Map();
   containsCode = false;
   assetResolver = resolver.assetResolver;
@@ -31501,31 +31515,50 @@ exports.hyphenToCamel = function (str) {
 };
 }(utils));
 
-var name = "ejs";
-var description = "Embedded JavaScript templates";
-var keywords = [
-	"template",
-	"engine",
-	"ejs"
+var _args = [
+	[
+		"ejs@3.1.6",
+		"/home/chris/DEV/miscc"
+	]
 ];
-var version = "3.1.6";
-var author = "Matthew Eernisse <mde@fleegix.org> (http://fleegix.org)";
-var license = "Apache-2.0";
+var _from = "ejs@3.1.6";
+var _id = "ejs@3.1.6";
+var _inBundle = false;
+var _integrity = "sha512-9lt9Zse4hPucPkoP7FHDF0LQAlGyF9JVpnClFLFH3aSSbxmyoqINRpp/9wePWJTUl4KOQwRL72Iw3InHPDkoGw==";
+var _location = "/ejs";
+var _phantomChildren = {
+};
+var _requested = {
+	type: "version",
+	registry: true,
+	raw: "ejs@3.1.6",
+	name: "ejs",
+	escapedName: "ejs",
+	rawSpec: "3.1.6",
+	saveSpec: null,
+	fetchSpec: "3.1.6"
+};
+var _requiredBy = [
+	"/"
+];
+var _resolved = "https://registry.npmjs.org/ejs/-/ejs-3.1.6.tgz";
+var _spec = "3.1.6";
+var _where = "/home/chris/DEV/miscc";
+var author = {
+	name: "Matthew Eernisse",
+	email: "mde@fleegix.org",
+	url: "http://fleegix.org"
+};
 var bin = {
-	ejs: "./bin/cli.js"
+	ejs: "bin/cli.js"
 };
-var main$1 = "./lib/ejs.js";
-var jsdelivr = "ejs.min.js";
-var unpkg = "ejs.min.js";
-var repository = {
-	type: "git",
-	url: "git://github.com/mde/ejs.git"
+var bugs = {
+	url: "https://github.com/mde/ejs/issues"
 };
-var bugs = "https://github.com/mde/ejs/issues";
-var homepage = "https://github.com/mde/ejs";
 var dependencies = {
 	jake: "^10.6.1"
 };
+var description = "Embedded JavaScript templates";
 var devDependencies = {
 	browserify: "^16.5.1",
 	eslint: "^6.8.0",
@@ -31538,27 +31571,55 @@ var devDependencies = {
 var engines = {
 	node: ">=0.10.0"
 };
+var homepage = "https://github.com/mde/ejs";
+var jsdelivr = "ejs.min.js";
+var keywords = [
+	"template",
+	"engine",
+	"ejs"
+];
+var license = "Apache-2.0";
+var main$1 = "./lib/ejs.js";
+var name = "ejs";
+var repository = {
+	type: "git",
+	url: "git://github.com/mde/ejs.git"
+};
 var scripts = {
 	test: "mocha"
 };
+var unpkg = "ejs.min.js";
+var version = "3.1.6";
 var require$$3 = {
-	name: name,
-	description: description,
-	keywords: keywords,
-	version: version,
+	_args: _args,
+	_from: _from,
+	_id: _id,
+	_inBundle: _inBundle,
+	_integrity: _integrity,
+	_location: _location,
+	_phantomChildren: _phantomChildren,
+	_requested: _requested,
+	_requiredBy: _requiredBy,
+	_resolved: _resolved,
+	_spec: _spec,
+	_where: _where,
 	author: author,
-	license: license,
 	bin: bin,
-	main: main$1,
-	jsdelivr: jsdelivr,
-	unpkg: unpkg,
-	repository: repository,
 	bugs: bugs,
-	homepage: homepage,
 	dependencies: dependencies,
+	description: description,
 	devDependencies: devDependencies,
 	engines: engines,
-	scripts: scripts
+	homepage: homepage,
+	jsdelivr: jsdelivr,
+	keywords: keywords,
+	license: license,
+	main: main$1,
+	name: name,
+	repository: repository,
+	scripts: scripts,
+	unpkg: unpkg,
+	version: version
 };
 
 /*
@@ -32544,7 +32605,7 @@ async function transformPost(post, outputBaseDir, context) {
     html
   } = parseMarkdown(content, {
     pageResolver: ref => pageResolver(ref, post.dest),
-    assetResolver: ref => assetResolver(ref, srcFile)
+    assetResolver: ref => assetResolver(ref, srcFile, post.dest)
   });
   let templateName = metaEntries.get("template") || "post";
   const template = `${templateDir}/pages/${templateName}.ejs`;

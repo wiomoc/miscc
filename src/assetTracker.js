@@ -13,7 +13,7 @@ export class AssetTracker {
         this._outputs = new Set();
     }
 
-    resolve(ref, basePath) {
+    resolve(ref, srcPath, currentRef) {
         if (!ref) return;
 
         let assetFile;
@@ -22,7 +22,7 @@ export class AssetTracker {
         } else if (ref.startsWith("https://") || ref.startsWith("https://") || ref.indexOf("../") !== -1) {
             return null;
         } else {
-            const dir = path.dirname(basePath);
+            const dir = path.dirname(srcPath);
             assetFile = dir + "/" + ref;
         }
 
@@ -33,7 +33,11 @@ export class AssetTracker {
             }
             assetOutputFile = this.add(assetFile);
         }
-        return "/" + assetOutputFile;
+        if (currentRef) {
+            return path.relative(path.basename(currentRef), assetOutputFile);
+        } else {
+            return "/" + assetOutputFile;
+        }
     }
 
     add(assetFile) {

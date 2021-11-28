@@ -28,7 +28,7 @@ export async function transformPost(post, outputBaseDir, context) {
         html
     } = parseMarkdown(content, {
         pageResolver: (ref) => pageResolver(ref, post.dest),
-        assetResolver: (ref) => assetResolver(ref, srcFile)
+        assetResolver: (ref) => assetResolver(ref, srcFile, post.dest)
     });
 
     let templateName = metaEntries.get("template") || "post";

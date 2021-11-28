@@ -28,7 +28,7 @@ const footnoteRef = {
     level: 'inline',
     start(src) { return src.match(/\[\^/)?.index; },
     tokenizer(src, tokens) {
-        const rule = /^\[\^(.*)\][^:]/;
+        const rule = /^\[\^(\S+)\][^:]/;
         const match = rule.exec(src);
         if (match) {
             return {
@@ -40,7 +40,7 @@ const footnoteRef = {
     },
     renderer(token) {
         if (!footnotes.has(token.index)) {
-            console.warn("Unknown footnote");
+            console.warn(`Unknown footnote '${token.index}'`);
             return "";
         } else {
             return `\n<a href="#anchor-${token.index}">${token.index}</a>`;
@@ -53,7 +53,7 @@ const footnoteDef = {
     level: 'block',
     start(src) { return src.match(/\[\^/)?.index; },
     tokenizer(src, tokens) {
-        const rule = /^\[\^(.*)\]:\s?(.*)/;
+        const rule = /^\[\^(\S+)\]:\s?(.*)/;
         const match = rule.exec(src);
 
         if (match) {
@@ -95,6 +95,8 @@ const renderer = {
         let href = assetResolver(ref);
         if (!href) {
             href = ref;
+        } else if(ref.endsWith(".html")) {
+            return `<iframe src="${href}">${text}</iframe>`
         }
         return Renderer.prototype.image.call(this, href, title, text)
     }
