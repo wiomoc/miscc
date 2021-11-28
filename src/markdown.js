@@ -22,6 +22,57 @@ const meta = {
     },
 };
 
+let footnotes;
+const footnoteRef = {
+    name: 'footnoteRef',
+    level: 'inline',
+    start(src) { return src.match(/\[\^/)?.index; },
+    tokenizer(src, tokens) {
+        const rule = /^\[\^(.*)\][^:]/;
+        const match = rule.exec(src);
+        if (match) {
+            return {
+                type: 'footnoteRef',
+                raw: match[0],
+                index: match[1]
+            }
+        }
+    },
+    renderer(token) {
+        if (!footnotes.has(token.index)) {
+            console.warn("Unknown footnote");
+            return "";
+        } else {
+            return `\n<a href="#anchor-${token.index}">${token.index}</a>`;
+        }
+    },
+};
+
+const footnoteDef = {
+    name: 'footnoteDef',
+    level: 'block',
+    start(src) { return src.match(/\[\^/)?.index; },
+    tokenizer(src, tokens) {
+        const rule = /^\[\^(.*)\]:\s?(.*)/;
+        const match = rule.exec(src);
+
+        if (match) {
+            footnotes.add(match[1]);
+            return {
+                type: 'footnoteDef',
+                raw: match[0],
+                index: match[1],
+                content: this.lexer.inlineTokens(match[2])
+            }
+        } else {
+            return footnoteRef.tokenizer(src, tokens)
+        }
+    },
+    renderer(token) {
+        return `\n<div id="anchor-${token.index}">${token.index}: ${this.parser.parseInline(token.content)}</div>`;
+    },
+};
+
 let assetResolver;
 let pageResolver;
 
@@ -49,7 +100,7 @@ const renderer = {
     }
 }
 
-marked.use({ extensions: [meta], renderer });
+marked.use({ extensions: [meta, footnoteDef, footnoteRef], renderer });
 
 let containsCode
 marked.setOptions({
@@ -65,6 +116,7 @@ marked.setOptions({
 
 // Not reentrant
 export function parseMarkdown(markdownSource, resolver) {
+    footnotes = new Set();
     metaEntries = new Map();
     containsCode = false;
     assetResolver = resolver.assetResolver;

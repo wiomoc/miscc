@@ -31203,6 +31203,64 @@ const meta = {
   }
 
 };
+let footnotes;
+const footnoteRef = {
+  name: 'footnoteRef',
+  level: 'inline',
+
+  start(src) {
+    var _src$match2;
+
+    return (_src$match2 = src.match(/\[\^/)) === null || _src$match2 === void 0 ? void 0 : _src$match2.index;
+  },
+
+  tokenizer(src, tokens) {
+    const rule = /^\[\^(.*)\][^:]/;
+    const match = rule.exec(src);
+
+    if (match) {
+      return {
+        type: 'footnoteRef',
+        raw: match[0],
+        index: match[1]
+      };
+    }
+  },
+
+  renderer(token) {
+    return `\n<a href=#${token.index}>abc</a>`;
+  }
+
+};
+const footnoteDef = {
+  name: 'footnoteDef',
+  level: 'block',
+
+  start(src) {
+    var _src$match3;
+
+    return (_src$match3 = src.match(/\[\^/)) === null || _src$match3 === void 0 ? void 0 : _src$match3.index;
+  },
+
+  tokenizer(src, tokens) {
+    const rule = /^\[\^(.*)\]:\s?(.*)/;
+    const match = rule.exec(src);
+    console.log(match);
+
+    if (match) {
+      footnotes.set(match[1], match[2]);
+      return {
+        type: 'space',
+        raw: match[0]
+      };
+    }
+  },
+
+  renderer(token) {
+    return `\n<a href=#${token.index}>abc</a>`;
+  }
+
+};
 let assetResolver;
 let pageResolver;
 const renderer = {
@@ -31236,7 +31294,7 @@ const renderer = {
 
 };
 marked.use({
-  extensions: [meta],
+  extensions: [meta, footnoteDef, footnoteRef],
   renderer
 });
 let containsCode;
@@ -31255,6 +31313,7 @@ marked.setOptions({
 }); // Not reentrant
 
 function parseMarkdown(markdownSource, resolver) {
+  footnotes = new Map();
   metaEntries = new Map();
   containsCode = false;
   assetResolver = resolver.assetResolver;
