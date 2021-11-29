@@ -3,7 +3,7 @@ tags: embedded
 title: Second Post
 ---
 
-# Heading
+# Heading Second
 
 Link to [first post](#article_0001)
 
@@ -49,12 +49,12 @@ ss
 
 ```kotlin
 fun main() {
-	embeddedServer(Netty, port = 8000) {
-		routing {
-			get ("/") {
-				call.respondText("Hello, world!")
-			}
-		}
-	}.start(wait = true)
+    embeddedServer(Netty, port = 8000) {
+        routing {
+            get ("/") {
+                call.respondText("Hello, world!")
+            }
+        }
+    }.start(wait = true)
 }
 ```
