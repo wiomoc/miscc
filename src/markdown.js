@@ -51,7 +51,7 @@ const footnoteRef = {
 const footnoteDef = {
     name: 'footnoteDef',
     level: 'block',
-    start(src) { return src.match(/\[\^/)?.index; },
+    start(src) { return src.match(/\[^\S+\]:/)?.index; },
     tokenizer(src, tokens) {
         const rule = /^\[\^(\S+)\]:\s?(.*)/;
         const match = rule.exec(src);
@@ -64,8 +64,6 @@ const footnoteDef = {
                 index: match[1],
                 content: this.lexer.inlineTokens(match[2])
             }
-        } else {
-            return footnoteRef.tokenizer(src, tokens)
         }
     },
     renderer(token) {
@@ -95,7 +93,7 @@ const renderer = {
         let href = assetResolver(ref);
         if (!href) {
             href = ref;
-        } else if(ref.endsWith(".html")) {
+        } else if (ref.endsWith(".html")) {
             return `<iframe src="${href}">${text}</iframe>`
         }
         return Renderer.prototype.image.call(this, href, title, text)
