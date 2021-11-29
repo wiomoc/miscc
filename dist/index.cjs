@@ -6617,7 +6617,7 @@ function readConfiguration(path) {
   let configString;
 
   try {
-    configString = fs__default["default"].readFileSync(path, "UTF-8");
+    configString = fs__default["default"].readFileSync(path, 'UTF-8');
   } catch (e) {
     throw new Error(`Configuration file '${path}' not found`);
   }
@@ -6630,7 +6630,7 @@ function readConfiguration(path) {
       throw new Error(`Invalid type '${typeof configYaml.tags}' for tags`);
     }
 
-    for (let tagName in configYaml.tags) {
+    for (const tagName in configYaml.tags) {
       if (tags.has(tagName)) {
         throw new Error(`Duplicate tag '${tagName}'`);
       }
@@ -6654,7 +6654,8 @@ function readConfiguration(path) {
   };
 }
 
-const postsOutputDir = "posts";
+const posts = 'posts';
+const postsOutputDir = 'posts';
 class PageTracker {
   constructor() {
     this._posts = new Map();
@@ -6663,7 +6664,7 @@ class PageTracker {
   resolve(ref, currentRef) {
     if (!ref) return;
 
-    if (ref.startsWith("#")) {
+    if (ref.startsWith('#')) {
       const postId = ref.substring(1);
 
       const post = this._posts.get(postId);
@@ -6676,7 +6677,7 @@ class PageTracker {
       if (currentRef) {
         return path__default["default"].relative(path__default["default"].basename(currentRef), post.dest);
       } else {
-        return "/" + post.dest;
+        return '/' + post.dest;
       }
     } else {
       return null;
@@ -6686,7 +6687,7 @@ class PageTracker {
   addPost(postFile) {
     let postId = path__default["default"].basename(postFile);
 
-    if (postId === "post.md") {
+    if (postId === 'post.md') {
       postId = path__default["default"].basename(path__default["default"].dirname(postFile));
     } else {
       // remove .md
@@ -6700,17 +6701,17 @@ class PageTracker {
     this._posts.set(postId, {
       id: postId,
       src: postFile,
-      dest: postsOutputDir + "/" + postId + ".html"
+      dest: postsOutputDir + '/' + postId + '.html'
     });
   }
 
-  discover(dir = postsOutputDir) {
+  discover(dir = posts) {
     for (let filepath of fs__default["default"].readdirSync(dir)) {
-      filepath = dir + "/" + filepath;
+      filepath = dir + '/' + filepath;
 
       if (fs__default["default"].statSync(filepath).isDirectory()) {
         this.discover(filepath);
-      } else if (path__default["default"].extname(filepath) === ".md") {
+      } else if (path__default["default"].extname(filepath) === '.md') {
         this.addPost(filepath);
       }
     }
@@ -6736,8 +6737,8 @@ function mkdirIfNotExists(dir) {
   }
 }
 
-const assetsDir = "assets";
-const assetsOutputDir = "assets";
+const assetsDir = 'assets';
+const assetsOutputDir = 'assets';
 class AssetTracker {
   constructor() {
     this._assetToOutputFileMap = new Map();
@@ -6748,13 +6749,13 @@ class AssetTracker {
     if (!ref) return;
     let assetFile;
 
-    if (ref.startsWith("/")) {
+    if (ref.startsWith('/')) {
       assetFile = assetsDir + ref;
-    } else if (ref.startsWith("https://") || ref.startsWith("https://") || ref.indexOf("../") !== -1) {
+    } else if (ref.startsWith('https://') || ref.startsWith('https://') || ref.indexOf('../') !== -1) {
       return null;
     } else {
       const dir = path__default["default"].dirname(srcPath);
-      assetFile = dir + "/" + ref;
+      assetFile = dir + '/' + ref;
     }
 
     let assetOutputFile = this._assetToOutputFileMap.get(assetFile);
@@ -6770,17 +6771,17 @@ class AssetTracker {
     if (currentRef) {
       return path__default["default"].relative(path__default["default"].basename(currentRef), assetOutputFile);
     } else {
-      return "/" + assetOutputFile;
+      return '/' + assetOutputFile;
     }
   }
 
   add(assetFile) {
     let outputFile = path__default["default"].basename(assetFile);
-    outputFile = assetsOutputDir + "/" + outputFile;
+    outputFile = assetsOutputDir + '/' + outputFile;
 
     if (this._outputs.has(assetFile)) {
-      const prefix = crypto.createHash("md5").update(assetFile).digest("hex").substring(0, 8);
-      outputFile = outputBaseDir + "/" + prefix + outputFile;
+      const prefix = crypto.createHash('md5').update(assetFile).digest('hex').substring(0, 8);
+      outputFile = prefix + outputFile;
     }
 
     this._outputs.add(outputFile);
@@ -6792,8 +6793,8 @@ class AssetTracker {
 
   copyToOutput(outputBaseDir) {
     const copyFile = util.promisify(fs__default["default"].copyFile);
-    mkdirIfNotExists(outputBaseDir + "/" + assetsOutputDir);
-    return Promise.all([...this._assetToOutputFileMap.entries()].map(([src, dest]) => copyFile(src, outputBaseDir + "/" + dest)));
+    mkdirIfNotExists(outputBaseDir + '/' + assetsOutputDir);
+    return Promise.all([...this._assetToOutputFileMap.entries()].map(([src, dest]) => copyFile(src, outputBaseDir + '/' + dest)));
   }
 
 }
@@ -31188,14 +31189,14 @@ const meta = {
     return (_src$match = src.match(/^---/)) === null || _src$match === void 0 ? void 0 : _src$match.index;
   },
 
-  tokenizer(src, tokens) {
+  tokenizer(src) {
     const rule = /^---([\s\S\n]+)---/;
     const blockMatch = rule.exec(src);
 
     if (blockMatch) {
       const block = blockMatch[1];
 
-      for (let keyValueMatch of block.matchAll(/^(\S+):\s*(.+)$/gm)) {
+      for (const keyValueMatch of block.matchAll(/^(\S+):\s*(.+)$/gm)) {
         metaEntries.set(keyValueMatch[1], keyValueMatch[2]);
       }
 
@@ -31218,7 +31219,7 @@ const footnoteRef = {
     return (_src$match2 = src.match(/\[\^/)) === null || _src$match2 === void 0 ? void 0 : _src$match2.index;
   },
 
-  tokenizer(src, tokens) {
+  tokenizer(src) {
     const rule = /^\[\^(\S+)\][^:]/;
     const match = rule.exec(src);
 
@@ -31234,7 +31235,7 @@ const footnoteRef = {
   renderer(token) {
     if (!footnotes.has(token.index)) {
       console.warn(`Unknown footnote '${token.index}'`);
-      return "";
+      return '';
     } else {
       return `\n<a href="#anchor-${token.index}">${token.index}</a>`;
     }
@@ -31248,10 +31249,10 @@ const footnoteDef = {
   start(src) {
     var _src$match3;
 
-    return (_src$match3 = src.match(/\[\^/)) === null || _src$match3 === void 0 ? void 0 : _src$match3.index;
+    return (_src$match3 = src.match(/\[^\S+\]:/)) === null || _src$match3 === void 0 ? void 0 : _src$match3.index;
   },
 
-  tokenizer(src, tokens) {
+  tokenizer(src) {
     const rule = /^\[\^(\S+)\]:\s?(.*)/;
     const match = rule.exec(src);
 
@@ -31263,8 +31264,6 @@ const footnoteDef = {
         index: match[1],
         content: this.lexer.inlineTokens(match[2])
       };
-    } else {
-      return footnoteRef.tokenizer(src, tokens);
     }
   },
 
@@ -31299,7 +31298,7 @@ const renderer = {
 
     if (!href) {
       href = ref;
-    } else if (ref.endsWith(".html")) {
+    } else if (ref.endsWith('.html')) {
       return `<iframe src="${href}">${text}</iframe>`;
     }
 
@@ -32588,7 +32587,7 @@ if (typeof window != 'undefined') {
 const readFile = util.promisify(fs__default["default"].readFile);
 const writeFile = util.promisify(fs__default["default"].writeFile);
 const stat = util.promisify(fs__default["default"].stat);
-const templateDir = "template";
+const templateDir = 'template';
 async function transformPost(post, outputBaseDir, context) {
   const srcFile = post.src;
   const {
@@ -32596,7 +32595,7 @@ async function transformPost(post, outputBaseDir, context) {
     assetResolver,
     tags: allTags
   } = context;
-  const content = await readFile(srcFile, "UTF-8");
+  const content = await readFile(srcFile, 'UTF-8');
   const fileStat = await stat(srcFile);
   const creationDate = fileStat.ctime;
   const {
@@ -32607,15 +32606,15 @@ async function transformPost(post, outputBaseDir, context) {
     pageResolver: ref => pageResolver(ref, post.dest),
     assetResolver: ref => assetResolver(ref, srcFile, post.dest)
   });
-  let templateName = metaEntries.get("template") || "post";
+  const templateName = metaEntries.get('template') || 'post';
   const template = `${templateDir}/pages/${templateName}.ejs`;
-  const title = metaEntries.get("title");
-  const tagNames = metaEntries.get("tags");
-  const priv = metaEntries.get("private") === "true";
+  const title = metaEntries.get('title');
+  const tagNames = metaEntries.get('tags');
+  const priv = metaEntries.get('private') === 'true';
   const tags = [];
 
   if (tagNames) {
-    for (let tagName of tagNames.split(",")) {
+    for (let tagName of tagNames.split(',')) {
       tagName = tagName.trim();
       const tag = allTags.get(tagName);
 
@@ -32642,8 +32641,8 @@ async function transformPost(post, outputBaseDir, context) {
   const resultHtml = await ejs.renderFile(template, data, {
     root: templateDir
   });
-  await writeFile(outputBaseDir + "/" + post.dest, resultHtml, {
-    encoding: "UTF-8"
+  await writeFile(outputBaseDir + '/' + post.dest, resultHtml, {
+    encoding: 'UTF-8'
   });
 }
 async function generateIndex(posts, outputBaseDir, context) {
@@ -32653,7 +32652,7 @@ async function generateIndex(posts, outputBaseDir, context) {
     tags
   } = context;
   const template = `${templateDir}/pages/index.ejs`;
-  const dest = "index.html";
+  const dest = 'index.html';
   const data = {
     ref: pageResolver,
     asset: assetResolver,
@@ -32663,15 +32662,15 @@ async function generateIndex(posts, outputBaseDir, context) {
   const resultHtml = await ejs.renderFile(template, data, {
     root: templateDir
   });
-  await writeFile(outputBaseDir + "/" + dest, resultHtml, {
-    encoding: "UTF-8"
+  await writeFile(outputBaseDir + '/' + dest, resultHtml, {
+    encoding: 'UTF-8'
   });
 }
 
 async function main() {
-  if (process__default["default"].env["INPUT_DIR"]) process__default["default"].chdir(process__default["default"].env["INPUT_DIR"]);
-  const outputBaseDir = process__default["default"].env["INPUT_OUTDIR"] || "dist";
-  const config = readConfiguration("miscc.yml");
+  if (process__default["default"].env.INPUT_DIR) process__default["default"].chdir(process__default["default"].env.INPUT_DIR);
+  const outputBaseDir = process__default["default"].env.INPUT_OUTDIR || 'dist';
+  const config = readConfiguration('miscc.yml');
   const pageTracker = new PageTracker();
   pageTracker.discover();
   const assetTracker = new AssetTracker();
@@ -32681,7 +32680,7 @@ async function main() {
     assetResolver: assetTracker.resolve.bind(assetTracker)
   };
   mkdirIfNotExists(outputBaseDir);
-  mkdirIfNotExists(outputBaseDir + "/posts");
+  mkdirIfNotExists(outputBaseDir + '/posts');
   await Promise.all([...pageTracker.posts].map(post => transformPost(post, outputBaseDir, context)));
   await generateIndex(pageTracker.publicPosts, outputBaseDir, context);
   await assetTracker.copyToOutput(outputBaseDir);

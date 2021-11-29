@@ -3,7 +3,7 @@ tags: embedded
 title: Second Post
 ---
 
-# Heading Second
+## Heading Second
 
 Link to [first post](#article_0001)
 
