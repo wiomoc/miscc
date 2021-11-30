@@ -1,26 +1,6 @@
 import { marked, Renderer, Parser } from 'marked'
+import fr from 'front-matter'
 import hljs from 'highlight.js'
-
-let metaEntries
-const meta = {
-  name: 'meta',
-  level: 'block',
-  start(src) { return src.match(/^---/)?.index },
-  tokenizer(src) {
-    const rule = /^---([\s\S\n]+)---/
-    const blockMatch = rule.exec(src)
-    if (blockMatch) {
-      const block = blockMatch[1]
-      for (const keyValueMatch of block.matchAll(/^(\S+):\s*(.+)$/gm)) {
-        metaEntries.set(keyValueMatch[1], keyValueMatch[2])
-      }
-      return {
-        type: 'space',
-        raw: blockMatch[0]
-      }
-    }
-  }
-}
 
 let footnotes
 const footnoteRef = {
@@ -102,7 +82,7 @@ const renderer = {
   }
 }
 
-marked.use({ extensions: [meta, footnoteDef, footnoteRef], renderer })
+marked.use({ extensions: [footnoteDef, footnoteRef], renderer })
 
 let containsCode
 marked.setOptions({
@@ -119,14 +99,12 @@ marked.setOptions({
 // Not reentrant
 export function parseMarkdown(markdownSource, resolver) {
   footnotes = new Map()
-  metaEntries = new Map()
   containsCode = false
   assetResolver = resolver.assetResolver
   pageResolver = resolver.pageResolver
-  const parser = new Parser()
-  let html = marked.parse(markdownSource, {
-    parser: parser
-  })
+  const frontMatter = fr(markdownSource);
+  const metaEntries = new Map(Object.entries(frontMatter.attributes))
+  let html = marked.parse(frontMatter.body)
   if (footnotes.size) {
     html += "<ol>\n"
     const footnoteEntries = [...footnotes.entries()];
