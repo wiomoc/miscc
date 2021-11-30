@@ -1,4 +1,4 @@
-import { marked, Renderer } from 'marked'
+import { marked, Renderer, Parser } from 'marked'
 import hljs from 'highlight.js'
 
 let metaEntries
@@ -28,46 +28,48 @@ const footnoteRef = {
   level: 'inline',
   start(src) { return src.match(/\[\^/)?.index },
   tokenizer(src) {
-    const rule = /^\[\^(\S+)\][^:]/
+    const rule = /^\[\^(\S+)\](?!:)/
     const match = rule.exec(src)
     if (match) {
       return {
         type: 'footnoteRef',
         raw: match[0],
-        index: match[1]
+        name: match[1]
       }
     }
   },
   renderer(token) {
-    if (!footnotes.has(token.index)) {
-      console.warn(`Unknown footnote '${token.index}'`)
+    const footnote = footnotes.get(token.name);
+    if (!footnote) {
+      console.warn(`Unknown footnote '${token.name}'`)
       return ''
     } else {
-      return `\n<a href="#anchor-${token.index}">${token.index}</a>`
+      return `<sup><a href="#anchor-${token.name}">${footnote.number}</a></sup>`
     }
   }
 }
 
 const footnoteDef = {
   name: 'footnoteDef',
-  level: 'block',
-  start(src) { return src.match(/\[^\S+\]:/)?.index },
+  level: 'inline',
+  start(src) { return src.match(/\[\^\S+\]:/)?.index },
   tokenizer(src) {
-    const rule = /^\[\^(\S+)\]:\s?(.*)/
+    const rule = /^\[\^(\S+)\]:\s?(.*)\n?/
     const match = rule.exec(src)
 
     if (match) {
-      footnotes.add(match[1])
+      footnotes.set(match[1], {
+        content: this.lexer.inlineTokens(match[2]),
+        number: footnotes.size + 1
+      })
       return {
         type: 'footnoteDef',
         raw: match[0],
-        index: match[1],
-        content: this.lexer.inlineTokens(match[2])
       }
     }
   },
-  renderer(token) {
-    return `\n<div id="anchor-${token.index}">${token.index}: ${this.parser.parseInline(token.content)}</div>`
+  renderer() {
+    return '';
   }
 }
 
@@ -116,12 +118,25 @@ marked.setOptions({
 
 // Not reentrant
 export function parseMarkdown(markdownSource, resolver) {
-  footnotes = new Set()
+  footnotes = new Map()
   metaEntries = new Map()
   containsCode = false
   assetResolver = resolver.assetResolver
   pageResolver = resolver.pageResolver
-  const html = marked.parse(markdownSource)
+  const parser = new Parser()
+  let html = marked.parse(markdownSource, {
+    parser: parser
+  })
+  if (footnotes.size) {
+    html += "<ol>\n"
+    const footnoteEntries = [...footnotes.entries()];
+    footnoteEntries.sort((a, b) => a[1].number - b[1].number)
+    for (const [name, footnote] of footnoteEntries) {
+      html += `<li id="anchor-${name}">${Parser.parseInline(footnote.content)}</li>\n`
+    }
+    html += "</ol>"
+  }
+
   return {
     metaEntries,
     containsCode,
