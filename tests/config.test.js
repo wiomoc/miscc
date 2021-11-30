@@ -15,6 +15,8 @@ tags:
     misc:
         title: Misc
         color: '#F0F'
+dirs:
+    assets: assets2
 abc: 123`, (configFile) => {
       expect(readConfiguration(configFile)).toEqual({
         tags: new Map(Object.entries({
@@ -26,7 +28,15 @@ abc: 123`, (configFile) => {
             title: 'Misc',
             color: '#F0F'
           }
-        }))
+        })),
+        dirs: {
+          assets: "assets2",
+          assetsOutput: "assets",
+          outputBase: "dist",
+          posts: "posts",
+          postsOutput: "posts",
+          template: "template",
+        }
       })
     })
   })
@@ -35,7 +45,15 @@ abc: 123`, (configFile) => {
     withTempFile(`
 abc: 123`, (configFile) => {
       expect(readConfiguration(configFile)).toEqual({
-        tags: new Map()
+        tags: new Map(),
+        dirs: {
+          assets: "assets",
+          assetsOutput: "assets",
+          outputBase: "dist",
+          posts: "posts",
+          postsOutput: "posts",
+          template: "template",
+        }
       })
     })
   })

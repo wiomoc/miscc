@@ -1,0 +1,12 @@
+{
+  "name": "miscc-example-template",
+  "version": "1.0.0",
+  "description": "example template",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.1.3",
+    "highlight.js": "^11.3.1"
+  }
+}

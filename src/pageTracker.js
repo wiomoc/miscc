@@ -1,12 +1,11 @@
 import fs from 'fs'
 import path from 'path'
 
-const posts = 'posts'
-const postsOutputDir = 'posts'
 
 export class PageTracker {
-  constructor() {
+  constructor(config) {
     this._posts = new Map()
+    this._config = config
   }
 
   resolve(ref, currentRef) {
@@ -43,11 +42,11 @@ export class PageTracker {
     this._posts.set(postId, {
       id: postId,
       src: postFile,
-      dest: postsOutputDir + '/' + postId + '.html'
+      dest: this._config.dirs.postsOutput + '/' + postId + '.html'
     })
   }
 
-  discover(dir = posts) {
+  discover(dir = this._config.dirs.posts) {
     for (let filepath of fs.readdirSync(dir)) {
       filepath = dir + '/' + filepath
       if (fs.statSync(filepath).isDirectory()) {

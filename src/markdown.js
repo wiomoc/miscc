@@ -6,7 +6,7 @@ let footnotes
 const footnoteRef = {
   name: 'footnoteRef',
   level: 'inline',
-  start(src) { return src.match(/\[\^/)?.index },
+  start: (src) => src.match(/\[\^\S+\](?!:)/)?.index,
   tokenizer(src) {
     const rule = /^\[\^(\S+)\](?!:)/
     const match = rule.exec(src)
@@ -32,7 +32,7 @@ const footnoteRef = {
 const footnoteDef = {
   name: 'footnoteDef',
   level: 'inline',
-  start(src) { return src.match(/\[\^\S+\]:/)?.index },
+  start: (src) => src.match(/\[\^\S+\]:/)?.index,
   tokenizer(src) {
     const rule = /^\[\^(\S+)\]:\s?(.*)\n?/
     const match = rule.exec(src)

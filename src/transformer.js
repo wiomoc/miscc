@@ -8,14 +8,14 @@ import ejs from 'ejs'
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 const stat = promisify(fs.stat)
-const templateDir = 'template'
 
-export async function transformPost(post, outputBaseDir, context) {
+export async function transformPost(post, context) {
   const srcFile = post.src
   const {
     pageResolver,
     assetResolver,
-    tags: allTags
+    tags: allTags,
+    config
   } = context
   const content = await readFile(srcFile, 'UTF-8')
   const fileStat = await stat(srcFile)
@@ -31,7 +31,7 @@ export async function transformPost(post, outputBaseDir, context) {
   })
 
   const templateName = metaEntries.get('template') || 'post'
-  const template = `${templateDir}/pages/${templateName}.ejs`
+  const template = `${config.dirs.template}/pages/${templateName}.ejs`
 
   const title = metaEntries.get('title')
   const tagNames = metaEntries.get('tags')
@@ -53,8 +53,8 @@ export async function transformPost(post, outputBaseDir, context) {
   post.creationDate = creationDate
 
   const data = {
-    ref: pageResolver,
-    asset: assetResolver,
+    ref: (ref) => pageResolver(ref, post.dest),
+    asset: (ref) => assetResolver(ref, template, post.dest),
     contentHtml: html,
     containsCode,
     metaEntries,
@@ -62,19 +62,20 @@ export async function transformPost(post, outputBaseDir, context) {
   }
 
   const resultHtml = await ejs.renderFile(template, data, {
-    root: templateDir
+    root: config.dirs.template
   })
 
-  await writeFile(outputBaseDir + '/' + post.dest, resultHtml, { encoding: 'UTF-8' })
+  await writeFile(config.dirs.outputBase + '/' + post.dest, resultHtml, { encoding: 'UTF-8' })
 }
 
-export async function generateIndex(posts, outputBaseDir, context) {
+export async function generateIndex(posts, context) {
   const {
     pageResolver,
     assetResolver,
-    tags
+    tags,
+    config
   } = context
-  const template = `${templateDir}/pages/index.ejs`
+  const template = `${config.dirs.template}/pages/index.ejs`
   const dest = 'index.html'
 
   const data = {
@@ -85,8 +86,8 @@ export async function generateIndex(posts, outputBaseDir, context) {
   }
 
   const resultHtml = await ejs.renderFile(template, data, {
-    root: templateDir
+    root: config.dirs.template
   })
 
-  await writeFile(outputBaseDir + '/' + dest, resultHtml, { encoding: 'UTF-8' })
+  await writeFile(config.dirs.outputBase + '/' + dest, resultHtml, { encoding: 'UTF-8' })
 }

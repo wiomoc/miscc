@@ -31,7 +31,17 @@ export function readConfiguration(path) {
     }
   }
 
+  const dirs = {}
+  const yamlDirs = configYaml.dirs || {}
+  dirs.outputBase = yamlDirs.outputBase || "dist"
+  dirs.template = yamlDirs.template || "template"
+  dirs.assets = yamlDirs.assets || "assets"
+  dirs.assetsOutput = yamlDirs.assetsOutput || "assets"
+  dirs.posts = yamlDirs.posts || "posts"
+  dirs.postsOutput = yamlDirs.postsOutput || "posts"
+
   return {
-    tags
+    tags,
+    dirs
   }
 }

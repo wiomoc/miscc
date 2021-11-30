@@ -42,8 +42,7 @@ lolol
 lolol
 
 lolol
-
-[^1]: https://www6.uniovi.es/gifanim/gif89a.txt
+[^1]: [GIF89 specification](https://www6.uniovi.es/gifanim/gif89a.txt)
 
 ss
 
