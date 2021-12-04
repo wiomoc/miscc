@@ -79,8 +79,8 @@ export async function generateIndex(posts, context) {
   const dest = 'index.html'
 
   const data = {
-    ref: pageResolver,
-    asset: assetResolver,
+    ref: (ref) => pageResolver(ref, "/"),
+    asset: (ref) => assetResolver(ref, template, "/"),
     posts,
     tags
   }
