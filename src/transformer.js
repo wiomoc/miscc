@@ -35,7 +35,7 @@ export async function transformPost(post, context) {
 
   const title = metaEntries.get('title')
   const tagNames = metaEntries.get('tags')
-  const priv = metaEntries.get('private') === 'true'
+  const priv = metaEntries.get('private') === true
   const tags = []
   if (tagNames) {
     for (let tagName of tagNames.split(',')) {
