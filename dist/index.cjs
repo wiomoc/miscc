@@ -36595,7 +36595,7 @@ async function transformPost(post, context) {
   const template = `${config.dirs.template}/pages/${templateName}.ejs`;
   const title = metaEntries.get('title');
   const tagNames = metaEntries.get('tags');
-  const priv = metaEntries.get('private') === 'true';
+  const priv = metaEntries.get('private') === true;
   const tags = [];
 
   if (tagNames) {
@@ -36640,8 +36640,8 @@ async function generateIndex(posts, context) {
   const template = `${config.dirs.template}/pages/index.ejs`;
   const dest = 'index.html';
   const data = {
-    ref: pageResolver,
-    asset: assetResolver,
+    ref: ref => pageResolver(ref, "/"),
+    asset: ref => assetResolver(ref, template, "/"),
     posts,
     tags
   };
