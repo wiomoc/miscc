@@ -104,7 +104,7 @@ export function parseMarkdown(markdownSource, resolver) {
   pageResolver = resolver.pageResolver
   const frontMatter = fr(markdownSource);
   const metaEntries = new Map(Object.entries(frontMatter.attributes))
-  let html = marked.parse(frontMatter.body)
+  let html = marked.parse(frontMatter.body, {langPrefix: "hljs "})
   if (footnotes.size) {
     html += "<ol>\n"
     const footnoteEntries = [...footnotes.entries()];

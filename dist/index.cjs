@@ -35350,7 +35350,9 @@ function parseMarkdown(markdownSource, resolver) {
   pageResolver = resolver.pageResolver;
   const frontMatter = fr(markdownSource);
   const metaEntries = new Map(Object.entries(frontMatter.attributes));
-  let html = marked.parse(frontMatter.body);
+  let html = marked.parse(frontMatter.body, {
+    langPrefix: "hljs "
+  });
 
   if (footnotes.size) {
     html += "<ol>\n";
@@ -35546,31 +35548,50 @@ exports.hyphenToCamel = function (str) {
 };
 }(utils));
 
-var name = "ejs";
-var description = "Embedded JavaScript templates";
-var keywords = [
-	"template",
-	"engine",
-	"ejs"
+var _args = [
+	[
+		"ejs@3.1.6",
+		"/home/chris/DEV/miscc"
+	]
 ];
-var version = "3.1.6";
-var author = "Matthew Eernisse <mde@fleegix.org> (http://fleegix.org)";
-var license = "Apache-2.0";
+var _from = "ejs@3.1.6";
+var _id = "ejs@3.1.6";
+var _inBundle = false;
+var _integrity = "sha512-9lt9Zse4hPucPkoP7FHDF0LQAlGyF9JVpnClFLFH3aSSbxmyoqINRpp/9wePWJTUl4KOQwRL72Iw3InHPDkoGw==";
+var _location = "/ejs";
+var _phantomChildren = {
+};
+var _requested = {
+	type: "version",
+	registry: true,
+	raw: "ejs@3.1.6",
+	name: "ejs",
+	escapedName: "ejs",
+	rawSpec: "3.1.6",
+	saveSpec: null,
+	fetchSpec: "3.1.6"
+};
+var _requiredBy = [
+	"/"
+];
+var _resolved = "https://registry.npmjs.org/ejs/-/ejs-3.1.6.tgz";
+var _spec = "3.1.6";
+var _where = "/home/chris/DEV/miscc";
+var author = {
+	name: "Matthew Eernisse",
+	email: "mde@fleegix.org",
+	url: "http://fleegix.org"
+};
 var bin = {
-	ejs: "./bin/cli.js"
+	ejs: "bin/cli.js"
 };
-var main$1 = "./lib/ejs.js";
-var jsdelivr = "ejs.min.js";
-var unpkg = "ejs.min.js";
-var repository = {
-	type: "git",
-	url: "git://github.com/mde/ejs.git"
+var bugs = {
+	url: "https://github.com/mde/ejs/issues"
 };
-var bugs = "https://github.com/mde/ejs/issues";
-var homepage = "https://github.com/mde/ejs";
 var dependencies = {
 	jake: "^10.6.1"
 };
+var description = "Embedded JavaScript templates";
 var devDependencies = {
 	browserify: "^16.5.1",
 	eslint: "^6.8.0",
@@ -35583,27 +35604,55 @@ var devDependencies = {
 var engines = {
 	node: ">=0.10.0"
 };
+var homepage = "https://github.com/mde/ejs";
+var jsdelivr = "ejs.min.js";
+var keywords = [
+	"template",
+	"engine",
+	"ejs"
+];
+var license = "Apache-2.0";
+var main$1 = "./lib/ejs.js";
+var name = "ejs";
+var repository = {
+	type: "git",
+	url: "git://github.com/mde/ejs.git"
+};
 var scripts = {
 	test: "mocha"
 };
+var unpkg = "ejs.min.js";
+var version = "3.1.6";
 var require$$3 = {
-	name: name,
-	description: description,
-	keywords: keywords,
-	version: version,
+	_args: _args,
+	_from: _from,
+	_id: _id,
+	_inBundle: _inBundle,
+	_integrity: _integrity,
+	_location: _location,
+	_phantomChildren: _phantomChildren,
+	_requested: _requested,
+	_requiredBy: _requiredBy,
+	_resolved: _resolved,
+	_spec: _spec,
+	_where: _where,
 	author: author,
-	license: license,
 	bin: bin,
-	main: main$1,
-	jsdelivr: jsdelivr,
-	unpkg: unpkg,
-	repository: repository,
 	bugs: bugs,
-	homepage: homepage,
 	dependencies: dependencies,
+	description: description,
 	devDependencies: devDependencies,
 	engines: engines,
-	scripts: scripts
+	homepage: homepage,
+	jsdelivr: jsdelivr,
+	keywords: keywords,
+	license: license,
+	main: main$1,
+	name: name,
+	repository: repository,
+	scripts: scripts,
+	unpkg: unpkg,
+	version: version
 };
 
 /*
