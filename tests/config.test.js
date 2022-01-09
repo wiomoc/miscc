@@ -8,6 +8,7 @@ import {
 describe('read config', () => {
   test('smoke test', () => {
     withTempFile(`
+rss: true
 tags:
     embedded:
         title: Embedded
@@ -36,7 +37,8 @@ abc: 123`, (configFile) => {
           posts: "posts",
           postsOutput: "posts",
           template: "template",
-        }
+        },
+        rss: true
       })
     })
   })
@@ -53,7 +55,8 @@ abc: 123`, (configFile) => {
           posts: "posts",
           postsOutput: "posts",
           template: "template",
-        }
+        },
+        rss: false
       })
     })
   })
