@@ -1,7 +1,7 @@
 import { readConfiguration } from './config.js'
 import { PageTracker } from './pageTracker.js'
 import { AssetTracker } from './assetTracker.js'
-import { transformPost, generateIndex } from './transformer.js'
+import { transformPost, generateOverview } from './transformer.js'
 import { mkdirIfNotExists } from './utils.js'
 import process from 'process'
 
@@ -28,7 +28,10 @@ async function main() {
   await Promise.all([...pageTracker.posts]
     .map(post => transformPost(post, context)))
 
-  await generateIndex(pageTracker.publicPosts, context)
+  await generateOverview(pageTracker.publicPosts, context, "index", "index.html")
+  if (config.rss) {
+    await generateOverview(pageTracker.publicPosts, context, "rss", "rss.xml")
+  }
   await assetTracker.copyToOutput()
 }
 

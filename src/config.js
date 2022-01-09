@@ -42,6 +42,7 @@ export function readConfiguration(path) {
 
   return {
     tags,
-    dirs
+    dirs,
+    rss: !!configYaml.rss
   }
 }

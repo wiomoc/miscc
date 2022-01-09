@@ -28,8 +28,10 @@ export async function transformPost(post, context) {
     assetResolver: (ref) => assetResolver(ref, srcFile, post.dest)
   })
 
-  let creationDate = metaEntries.get('date')
-  if (!creationDate) {
+  let creationDate;
+  if (metaEntries.has('date')) {
+    creationDate = new Date(metaEntries.get('date'))
+  } else {
     const fileStat = await stat(srcFile)
     creationDate = fileStat.ctime
   }
@@ -73,15 +75,14 @@ export async function transformPost(post, context) {
   await writeFile(config.dirs.outputBase + '/' + post.dest, resultHtml, { encoding: 'UTF-8' })
 }
 
-export async function generateIndex(posts, context) {
+export async function generateOverview(posts, context, templateName, dest) {
   const {
     pageResolver,
     assetResolver,
     tags,
     config
   } = context
-  const template = `${config.dirs.template}/pages/index.ejs`
-  const dest = 'index.html'
+  const template = `${config.dirs.template}/pages/${templateName}.ejs`
 
   const data = {
     ref: (ref) => pageResolver(ref, "/"),

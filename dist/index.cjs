@@ -6665,7 +6665,8 @@ function readConfiguration(path) {
   dirs.postsOutput = yamlDirs.postsOutput || "posts";
   return {
     tags,
-    dirs
+    dirs,
+    rss: !!configYaml.rss
   };
 }
 
@@ -35318,9 +35319,11 @@ const renderer = {
       href = ref;
     } else if (ref.endsWith('.html')) {
       return `<iframe src="${href}">${text}</iframe>`;
+    } else if (ref.endsWith('.mp4')) {
+      return `<video autoplay muted loop><source src="${href}" type="video/mp4">${text}</video>`;
+    } else {
+      return Renderer.prototype.image.call(this, href, title, text);
     }
-
-    return Renderer.prototype.image.call(this, href, title, text);
   }
 
 };
@@ -35548,50 +35551,31 @@ exports.hyphenToCamel = function (str) {
 };
 }(utils));
 
-var _args = [
-	[
-		"ejs@3.1.6",
-		"/home/chris/DEV/miscc"
-	]
+var name = "ejs";
+var description = "Embedded JavaScript templates";
+var keywords = [
+	"template",
+	"engine",
+	"ejs"
 ];
-var _from = "ejs@3.1.6";
-var _id = "ejs@3.1.6";
-var _inBundle = false;
-var _integrity = "sha512-9lt9Zse4hPucPkoP7FHDF0LQAlGyF9JVpnClFLFH3aSSbxmyoqINRpp/9wePWJTUl4KOQwRL72Iw3InHPDkoGw==";
-var _location = "/ejs";
-var _phantomChildren = {
-};
-var _requested = {
-	type: "version",
-	registry: true,
-	raw: "ejs@3.1.6",
-	name: "ejs",
-	escapedName: "ejs",
-	rawSpec: "3.1.6",
-	saveSpec: null,
-	fetchSpec: "3.1.6"
-};
-var _requiredBy = [
-	"/"
-];
-var _resolved = "https://registry.npmjs.org/ejs/-/ejs-3.1.6.tgz";
-var _spec = "3.1.6";
-var _where = "/home/chris/DEV/miscc";
-var author = {
-	name: "Matthew Eernisse",
-	email: "mde@fleegix.org",
-	url: "http://fleegix.org"
-};
+var version = "3.1.6";
+var author = "Matthew Eernisse <mde@fleegix.org> (http://fleegix.org)";
+var license = "Apache-2.0";
 var bin = {
-	ejs: "bin/cli.js"
+	ejs: "./bin/cli.js"
 };
-var bugs = {
-	url: "https://github.com/mde/ejs/issues"
+var main$1 = "./lib/ejs.js";
+var jsdelivr = "ejs.min.js";
+var unpkg = "ejs.min.js";
+var repository = {
+	type: "git",
+	url: "git://github.com/mde/ejs.git"
 };
+var bugs = "https://github.com/mde/ejs/issues";
+var homepage = "https://github.com/mde/ejs";
 var dependencies = {
 	jake: "^10.6.1"
 };
-var description = "Embedded JavaScript templates";
 var devDependencies = {
 	browserify: "^16.5.1",
 	eslint: "^6.8.0",
@@ -35604,55 +35588,27 @@ var devDependencies = {
 var engines = {
 	node: ">=0.10.0"
 };
-var homepage = "https://github.com/mde/ejs";
-var jsdelivr = "ejs.min.js";
-var keywords = [
-	"template",
-	"engine",
-	"ejs"
-];
-var license = "Apache-2.0";
-var main$1 = "./lib/ejs.js";
-var name = "ejs";
-var repository = {
-	type: "git",
-	url: "git://github.com/mde/ejs.git"
-};
 var scripts = {
 	test: "mocha"
 };
-var unpkg = "ejs.min.js";
-var version = "3.1.6";
 var require$$3 = {
-	_args: _args,
-	_from: _from,
-	_id: _id,
-	_inBundle: _inBundle,
-	_integrity: _integrity,
-	_location: _location,
-	_phantomChildren: _phantomChildren,
-	_requested: _requested,
-	_requiredBy: _requiredBy,
-	_resolved: _resolved,
-	_spec: _spec,
-	_where: _where,
-	author: author,
-	bin: bin,
-	bugs: bugs,
-	dependencies: dependencies,
+	name: name,
 	description: description,
+	keywords: keywords,
+	version: version,
+	author: author,
+	license: license,
+	bin: bin,
+	main: main$1,
+	jsdelivr: jsdelivr,
+	unpkg: unpkg,
+	repository: repository,
+	bugs: bugs,
+	homepage: homepage,
+	dependencies: dependencies,
 	devDependencies: devDependencies,
 	engines: engines,
-	homepage: homepage,
-	jsdelivr: jsdelivr,
-	keywords: keywords,
-	license: license,
-	main: main$1,
-	name: name,
-	repository: repository,
-	scripts: scripts,
-	unpkg: unpkg,
-	version: version
+	scripts: scripts
 };
 
 /*
@@ -36630,8 +36586,6 @@ async function transformPost(post, context) {
     config
   } = context;
   const content = await readFile(srcFile, 'UTF-8');
-  const fileStat = await stat(srcFile);
-  const creationDate = fileStat.ctime;
   const {
     metaEntries,
     containsCode,
@@ -36640,6 +36594,15 @@ async function transformPost(post, context) {
     pageResolver: ref => pageResolver(ref, post.dest),
     assetResolver: ref => assetResolver(ref, srcFile, post.dest)
   });
+  let creationDate;
+
+  if (metaEntries.has('date')) {
+    creationDate = new Date(metaEntries.get('date'));
+  } else {
+    const fileStat = await stat(srcFile);
+    creationDate = fileStat.ctime;
+  }
+
   const templateName = metaEntries.get('template') || 'post';
   const template = `${config.dirs.template}/pages/${templateName}.ejs`;
   const title = metaEntries.get('title');
@@ -36679,15 +36642,14 @@ async function transformPost(post, context) {
     encoding: 'UTF-8'
   });
 }
-async function generateIndex(posts, context) {
+async function generateOverview(posts, context, templateName, dest) {
   const {
     pageResolver,
     assetResolver,
     tags,
     config
   } = context;
-  const template = `${config.dirs.template}/pages/index.ejs`;
-  const dest = 'index.html';
+  const template = `${config.dirs.template}/pages/${templateName}.ejs`;
   const data = {
     ref: ref => pageResolver(ref, "/"),
     asset: ref => assetResolver(ref, template, "/"),
@@ -36724,7 +36686,12 @@ async function main() {
   mkdirIfNotExists(config.dirs.outputBase);
   mkdirIfNotExists(config.dirs.outputBase + '/' + config.dirs.postsOutput);
   await Promise.all([...pageTracker.posts].map(post => transformPost(post, context)));
-  await generateIndex(pageTracker.publicPosts, context);
+  await generateOverview(pageTracker.publicPosts, context, "index", "index.html");
+
+  if (config.rss) {
+    await generateOverview(pageTracker.publicPosts, context, "rss", "rss.xml");
+  }
+
   await assetTracker.copyToOutput();
 }
 
