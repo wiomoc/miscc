@@ -77,8 +77,11 @@ const renderer = {
       href = ref
     } else if (ref.endsWith('.html')) {
       return `<iframe src="${href}">${text}</iframe>`
+    } else if (ref.endsWith('.mp4')) {
+      return `<video autoplay muted loop><source src="${href}" type="video/mp4">${text}</video>`
+    } else {
+      return Renderer.prototype.image.call(this, href, title, text)
     }
-    return Renderer.prototype.image.call(this, href, title, text)
   }
 }
 
@@ -104,7 +107,7 @@ export function parseMarkdown(markdownSource, resolver) {
   pageResolver = resolver.pageResolver
   const frontMatter = fr(markdownSource);
   const metaEntries = new Map(Object.entries(frontMatter.attributes))
-  let html = marked.parse(frontMatter.body, {langPrefix: "hljs "})
+  let html = marked.parse(frontMatter.body, { langPrefix: "hljs " })
   if (footnotes.size) {
     html += "<ol>\n"
     const footnoteEntries = [...footnotes.entries()];

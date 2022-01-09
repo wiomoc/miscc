@@ -18,8 +18,6 @@ export async function transformPost(post, context) {
     config
   } = context
   const content = await readFile(srcFile, 'UTF-8')
-  const fileStat = await stat(srcFile)
-  const creationDate = fileStat.ctime
 
   const {
     metaEntries,
@@ -29,6 +27,13 @@ export async function transformPost(post, context) {
     pageResolver: (ref) => pageResolver(ref, post.dest),
     assetResolver: (ref) => assetResolver(ref, srcFile, post.dest)
   })
+
+  let creationDate = metaEntries.get('date')
+  if (!creationDate) {
+    const fileStat = await stat(srcFile)
+    creationDate = fileStat.ctime
+  }
+
 
   const templateName = metaEntries.get('template') || 'post'
   const template = `${config.dirs.template}/pages/${templateName}.ejs`
