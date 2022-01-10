@@ -28,9 +28,10 @@ async function main() {
   await Promise.all([...pageTracker.posts]
     .map(post => transformPost(post, context)))
 
-  await generateOverview(pageTracker.publicPosts, context, "index", "index.html")
+  const publicPostsDateDesc = pageTracker.publicPosts.sort((a, b) => b.creationDate.valueOf() - a.creationDate.valueOf());
+  await generateOverview(publicPostsDateDesc, context, "index", "index.html")
   if (config.rss) {
-    await generateOverview(pageTracker.publicPosts, context, "rss", "rss.xml")
+    await generateOverview(publicPostsDateDesc, context, "rss", "rss.xml")
   }
   await assetTracker.copyToOutput()
 }
