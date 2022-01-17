@@ -65,7 +65,8 @@ export async function transformPost(post, context) {
     contentHtml: html,
     containsCode,
     metaEntries,
-    ...post
+    ...post,
+    MISCC_VERSION: global.MISCC_VERSION
   }
 
   const resultHtml = await ejs.renderFile(template, data, {
@@ -83,12 +84,12 @@ export async function generateOverview(posts, context, templateName, dest) {
     config
   } = context
   const template = `${config.dirs.template}/pages/${templateName}.ejs`
-
   const data = {
     ref: (ref) => pageResolver(ref, "/"),
     asset: (ref) => assetResolver(ref, template, "/"),
     posts,
-    tags
+    tags,
+    MISCC_VERSION: global.MISCC_VERSION
   }
 
   const resultHtml = await ejs.renderFile(template, data, {

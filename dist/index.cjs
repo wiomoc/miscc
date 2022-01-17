@@ -1,5 +1,7 @@
 'use strict';
 
+global.MISCC_VERSION = "v0.0.4-7-g990eda4";
+
 var fs = require('fs');
 var path = require('path');
 var childProcess = require('child_process');
@@ -36633,7 +36635,8 @@ async function transformPost(post, context) {
     contentHtml: html,
     containsCode,
     metaEntries,
-    ...post
+    ...post,
+    MISCC_VERSION: global.MISCC_VERSION
   };
   const resultHtml = await ejs.renderFile(template, data, {
     root: config.dirs.template
@@ -36654,7 +36657,8 @@ async function generateOverview(posts, context, templateName, dest) {
     ref: ref => pageResolver(ref, "/"),
     asset: ref => assetResolver(ref, template, "/"),
     posts,
-    tags
+    tags,
+    MISCC_VERSION: global.MISCC_VERSION
   };
   const resultHtml = await ejs.renderFile(template, data, {
     root: config.dirs.template
