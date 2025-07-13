@@ -41,11 +41,14 @@ export async function transformPost(post, context) {
   const template = `${config.dirs.template}/pages/${templateName}.ejs`
 
   const title = metaEntries.get('title')
-  const tagNames = metaEntries.get('tags')
+  let tagNames = metaEntries.get('tags')
   const priv = metaEntries.get('private') === true
   const tags = []
   if (tagNames) {
-    for (let tagName of tagNames.split(',')) {
+    if (!Array.isArray(tagNames)) {
+      tagNames = tagNames.split(',');
+    }
+    for (let tagName of tagNames) {
       tagName = tagName.trim()
       const tag = allTags.get(tagName)
       if (!tag) {
