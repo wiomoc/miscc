@@ -1,6 +1,7 @@
 import { marked, Renderer, Parser } from 'marked'
 import fr from 'front-matter'
 import hljs from 'highlight.js'
+import temml  from 'temml'
 
 let footnotes
 const footnoteRef = {
@@ -53,6 +54,27 @@ const footnoteDef = {
   }
 }
 
+const formular = {
+  name: 'formular',
+  level: 'inline',
+  start: (src) => src.indexOf('$'),
+  tokenizer(src) {
+    const rule = /^\$([^$\n]*)\$/
+    const match = rule.exec(src)
+
+    if (match) {
+      return {
+        type: 'formular',
+        raw: match[0],
+        text: match[1].trim()
+      }
+    }
+  },
+  renderer(token) {
+    return temml.renderToString(token.text);
+  }
+}
+
 let assetResolver
 let pageResolver
 
@@ -85,7 +107,7 @@ const renderer = {
   }
 }
 
-marked.use({ extensions: [footnoteDef, footnoteRef], renderer })
+marked.use({ extensions: [footnoteDef, footnoteRef, formular], renderer })
 
 let containsCode
 marked.setOptions({
